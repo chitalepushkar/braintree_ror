@@ -1,0 +1,37 @@
+<div class="wrapper">
+  <div class="checkout container">
+    <div class="content">
+
+      <label for="amount">
+        <span class="input-label">Amount</span>
+        <div class="input-wrapper amount-wrapper">
+          <input id="amount" name="amount" type="tel" min="1" placeholder="Amount" value="10">
+        </div>
+      </label>
+      <div id="dropin-container"></div>
+      <button id="submit-button">Request payment method</button>
+    </div>
+  </div>
+</div>
+<script>
+  var button = document.querySelector('#submit-button');
+
+  braintree.dropin.create({
+    authorization: "<%= @client_token %>",
+    container: '#dropin-container'
+  }, function (createErr, instance) {
+    button.addEventListener('click', function () {
+      instance.requestPaymentMethod(function (err, payload) {
+        // Submit payload.nonce to your server
+
+        payload['amount'] = $("#amount").val()
+
+        $.ajax({
+          type: 'POST',
+          url: '/checkouts',
+          data: payload
+        })
+      });
+    });
+  });
+</script>
